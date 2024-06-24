@@ -1,8 +1,10 @@
+import base64
 import os
 import time
 import openai
 import moviepy.editor as mp
 from pydub import AudioSegment
+import whisper
 
 #mp4をmp3に変換し、mp3のファイルパスを返す
 def convert_mp4_to_mp3(mp4_file_path):
@@ -15,9 +17,10 @@ def convert_mp4_to_mp3(mp4_file_path):
 #mp3ファイルを文字起こしし、テキストを返す
 def transcribe_audio(mp3_file_path):
     with open(mp3_file_path, 'rb') as audio_file:
-        transcription = openai.Audio.transcribe("whisper-1", audio_file, language='ja')
+        # transcription = openai.Audio.transcribe("whisper-1", audio_file, language='ja')
+        transcription = model.transcribe(mp3_file_path, language='ja')
 
-    return transcription.text
+    return transcription["text"]
 
 #テキストを保存
 def save_text_to_file(text, output_file_path):
@@ -41,7 +44,7 @@ def split_audio(mp3_file_path, interval_ms, output_folder):
         #分割
         split = audio[start:end]
         #出力ファイル名
-        output_file_name = output_folder + os.path.splitext(mp3_file_path)[0] + "_" + str(i) + ".mp3"
+        output_file_name = output_folder + os.path.splitext(file_name)[0] + "_" + str(i) + ".mp3"
         #出力
         split.export(output_file_name, format="mp3")
 
@@ -51,16 +54,20 @@ def split_audio(mp3_file_path, interval_ms, output_folder):
     #音声ファイルリストを出力
     return mp3_file_path_list
 
+encode_api_key = "c2stVzRCNmJsa1d5NlRQM2RpS2xKMUpUM0JsYmtGSnJYQXpmZ3FqT2tLUXdXdENQWmdP"
+openai.api_key = base64.b64decode(encode_api_key).decode("utf-8")
+
+
 mp4_file_path = r"C:\Users\cheap\Downloads\Y2meta.app-【受かるのは誰？】グループディスカッションをノーカットでお送りします。【突破法】-(720p).mp4"
 
 # mp3_file_path = convert_mp4_to_mp3(mp4_file_path)
 mp3_file_path = r"C:\Users\cheap\Downloads\Y2meta.app-【受かるのは誰？】グループディスカッションをノーカットでお送りします。【突破法】-(720p).mp3"
 
 output_folder = "./output/"
-interval_ms = 480_000 # 60秒 = 60_000ミリ秒
+interval_ms = 600_000 # 60秒 = 60_000ミリ秒
 
 mp3_file_path_list = split_audio(mp3_file_path, interval_ms, output_folder)
-
+model = whisper.load_model("small")
 transcription_list = []
 for mp3_file_path in mp3_file_path_list:
     transcription = transcribe_audio(mp3_file_path)

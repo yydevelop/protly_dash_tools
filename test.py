@@ -1,7 +1,5 @@
 import base64
 
-encode_api_key = "c2stVzRCNmJsa1d5NlRQM2RpS2xKMUpUM0JsYmtGSnJYQXpmZ3FqT2tLUXdXdENQWmdP"
-# api_key = base64.b64decode(api_key).decode('utf-8')
 
 import os
 import openai
@@ -9,6 +7,7 @@ import moviepy.editor as mp
 import whisper
 
 # APIキーの設定
+encode_api_key = "c2stVzRCNmJsa1d5NlRQM2RpS2xKMUpUM0JsYmtGSnJYQXpmZ3FqT2tLUXdXdENQWmdP"
 openai.api_key = base64.b64decode(encode_api_key).decode("utf-8")
 
 
